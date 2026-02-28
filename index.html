@@ -9,13 +9,15 @@
         body { background-color: var(--dark-bg); color: var(--text-color); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         header { width: 100%; padding: 20px 0; text-align: center; border-bottom: 3px solid var(--crimson); margin-bottom: 40px; }
         h1 { color: var(--crimson); margin: 0; letter-spacing: 5px; font-size: 2.5rem; text-transform: uppercase; }
-        .container { background: var(--card-bg); padding: 30px; border-radius: 15px; width: 90%; max-width: 450px; }
+        .container { background: var(--card-bg); padding: 30px; border-radius: 15px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background-color: var(--crimson); border: none; border-radius: 8px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #ccc; }
+        input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--crimson); }
+        button { width: 100%; padding: 15px; background-color: var(--crimson); border: none; border-radius: 8px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:active { transform: scale(0.98); }
         button:disabled { background-color: #555; cursor: not-allowed; }
-        .status { margin-top: 20px; padding: 15px; border-radius: 5px; background: rgba(220, 20, 60, 0.1); border: 1px solid var(--crimson); display: none; font-size: 0.9rem; line-height: 1.6; }
+        .status { margin-top: 20px; padding: 15px; border-radius: 5px; background: rgba(220, 20, 60, 0.1); border: 1px solid var(--crimson); display: none; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -46,24 +48,25 @@
         }
 
         statusBox.style.display = 'block';
-        statusBox.innerHTML = "[System] サーバー(Asuka-2)へ信号を送信中...";
+        statusBox.innerHTML = "[System] Asuka-2 サーバーへ信号を送信中...";
         btn.disabled = true;
 
         try {
-            // あなたのRender URLをここに組み込みました
+            // あなたの最新URLをここに組み込みました
             const response = await fetch('https://asuka-2.onrender.com/ignite', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url, count: count })
             });
             
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('サーバー応答エラー');
             
             const result = await response.json();
-            statusBox.innerHTML += `<br>[System] <span style="color: #00ff00;">${result.message}</span>`;
+            statusBox.innerHTML = `[System] <span style="color: #00ff00;">${result.message}</span>`;
+            
         } catch (error) {
             console.error('Error:', error);
-            statusBox.innerHTML += `<br>[Error] 接続失敗。Renderがスリープしている可能性があります。1分ほど待ってから再試行してください。`;
+            statusBox.innerHTML = `[Error] 接続失敗。Asuka-2 サーバーが起動するまで最大1分かかる場合があります。少し待ってからもう一度「点火」してください。`;
         } finally {
             btn.disabled = false;
         }
